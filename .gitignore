@@ -1,0 +1,17 @@
+# build output
+firmware/build/
+dist/
+*.o
+*.exe
+*.dll
+*.so
+
+# dependencies
+node_modules/
+__pycache__/
+.venv/
+
+# local
+*.log
+*.csv
+.DS_Store

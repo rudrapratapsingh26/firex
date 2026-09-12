@@ -1,0 +1,26 @@
+# An LPG cylinder leaking in a closed kitchen: gas climbs first, and the heat
+# channel follows once something ignites. This is the case FireX exists for —
+# the hazard is measurable for minutes before there is any flame.
+name: gas leak in a closed room
+description: Gas rises for two minutes, then heat agrees. Should reach CRITICAL on two independent signals.
+duration_s: 300
+interval_s: 2
+warmup_s: 0        # the node is already warm; warm-up is exercised in its own test
+
+channels:
+  gas:
+    - { until: 60,  from: 0.05, to: 0.25 }
+    - { until: 150, from: 0.25, to: 0.82 }
+    - { until: 300, from: 0.82, to: 0.90 }
+  gas_noise: 0.02
+  smoke:
+    - { until: 180, from: 0.05, to: 0.18 }
+    - { until: 300, from: 0.18, to: 0.45 }
+  heat:
+    - { until: 200, from: 0.05, to: 0.10 }
+    - { until: 240, from: 0.10, to: 0.72 }
+    - { until: 300, from: 0.72, to: 0.85 }
+  humidity: 0.35
+  flame: 0.0
+
+expect: [NORMAL, ELEVATED, CRITICAL]

@@ -1,0 +1,58 @@
+name: CI
+
+# Every push builds the firmware tests, runs both test suites and drives the
+# scenario simulator. None of it needs a board attached.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  fusion:
+    name: fusion engine (C)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit tests
+        run: make -C firmware test
+      - name: Build the simulator harness
+        run: make -C firmware sim
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fusion-build
+          path: firmware/build/
+
+  typescript:
+    name: ledger, verifier, escalation (TypeScript)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Type check
+        run: npm run typecheck
+      - name: Tests
+        run: npm test
+      - name: Vectors are reproducible
+        run: npm run vectors
+      - name: The M0 milestone demo
+        run: npm run demo
+
+  simulator:
+    name: scenarios (Python)
+    runs-on: ubuntu-latest
+    needs: fusion
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r tools/simulator/requirements.txt
+      - name: Build the engine harness
+        run: make -C firmware sim
+      - name: Every scenario behaves as declared
+        run: python tools/simulator/simulate.py

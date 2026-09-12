@@ -1,0 +1,29 @@
+# A welding arc in a PSU workshop: bright, flickering IR for tens of seconds.
+# With the flame-alone rule on (v1.0 section 12, open decision), this reaches
+# CRITICAL with no second modality — the known false positive that M4 has to
+# measure and that the pilot sites will decide.
+name: welding flash
+description: A sustained IR flicker with no gas, smoke or heat. Reaches CRITICAL on the flame-alone rule.
+duration_s: 180
+interval_s: 2
+warmup_s: 0
+
+channels:
+  flame:
+    - { until: 30,  from: 0.0,  to: 0.0 }
+    - { until: 34,  from: 0.0,  to: 0.95 }
+    - { until: 90,  from: 0.95, to: 0.97 }
+    - { until: 100, from: 0.97, to: 0.0 }
+    - { until: 180, from: 0.0,  to: 0.0 }
+  gas: 0.06
+  smoke:
+    - { until: 90,  from: 0.06, to: 0.22 }   # a little fume, well under threshold
+    - { until: 180, from: 0.22, to: 0.08 }
+  heat: 0.10
+  humidity: 0.30
+
+expect: [NORMAL, CRITICAL]
+note: >
+  Known false positive. Switching flame_alone off in fx_config_t holds this at
+  NORMAL, at the cost of waiting for a second modality on a real open flame.
+  M4 measures both; the pilot sites choose.

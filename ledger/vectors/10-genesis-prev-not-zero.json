@@ -1,0 +1,33 @@
+{
+  "name": "10-genesis-prev-not-zero",
+  "description": "The first entry has a prev_hash of zero but claims seq 5.",
+  "expect": {
+    "ok": false,
+    "tier": "sequence",
+    "seq": 5
+  },
+  "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEwZqCccii5Gg97E1BiLUeKvcsPEQ7\njQqSENdRQJcLFbFm4e4Stf+9F7i81YfZhygJJclwZlAJvh9W1+HSv31Yow==\n-----END PUBLIC KEY-----\n",
+  "media": [
+    "7604cb9c9f2487ed9e4c95067fcb608420ce7efac385ee52c96a09f979c74929",
+    "ecaae410a18ab2c0f5288e28f53efbc348ec904eee89e82fc63e569de9879cf7",
+    "3107b21505ec62db0c3c775fe91e667b9e76fa818f20de90721146d0143f979e"
+  ],
+  "log": [
+    {
+      "seq": 5,
+      "ts": 1789000000,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "boot",
+      "payload": {
+        "fw_version": "0.1.0-m0",
+        "reset_reason": "power_on",
+        "boot_count": 12
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "c31dfd993e596b3ce156224d8932fae400264f5d4b85988c3ea9619bd570d2d5",
+      "sig": "9a6e49d361474863d53c505b8d2e3bd3d9e4b8fffa7cd35d291376e044878007e60fb44d921146dc11ce6fa3f6e4c550560ec0a0445d74d1595bc5a3232cbd3b"
+    }
+  ]
+}

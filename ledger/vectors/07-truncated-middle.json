@@ -1,0 +1,176 @@
+{
+  "name": "07-truncated-middle",
+  "description": "Four entries covering the alarm are cut out of the middle of the log.",
+  "expect": {
+    "ok": false,
+    "tier": "sequence",
+    "seq": 7
+  },
+  "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEwZqCccii5Gg97E1BiLUeKvcsPEQ7\njQqSENdRQJcLFbFm4e4Stf+9F7i81YfZhygJJclwZlAJvh9W1+HSv31Yow==\n-----END PUBLIC KEY-----\n",
+  "media": [
+    "7604cb9c9f2487ed9e4c95067fcb608420ce7efac385ee52c96a09f979c74929",
+    "ecaae410a18ab2c0f5288e28f53efbc348ec904eee89e82fc63e569de9879cf7",
+    "3107b21505ec62db0c3c775fe91e667b9e76fa818f20de90721146d0143f979e"
+  ],
+  "log": [
+    {
+      "seq": 0,
+      "ts": 1789000000,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "boot",
+      "payload": {
+        "fw_version": "0.1.0-m0",
+        "reset_reason": "power_on",
+        "boot_count": 12
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "32089c34ee5de8fac3e9af06061b8e6ef7000a252e0360dfd764c81842532d2e",
+      "sig": "e41d79b549fde34b3ecaf70a6b14b0b7cefa44e0fea24f7e99f13b1ebccf5f4647b219f5d86388892c3cea82cd942d49eb4089f7f7afcedb3ba8797251372dd3"
+    },
+    {
+      "seq": 1,
+      "ts": 1789000060,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "self_test",
+      "payload": {
+        "result": "pass",
+        "checks": {
+          "heater": true,
+          "buzzer": true,
+          "flame_loopback": true,
+          "fan": true,
+          "camera": true
+        }
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "32089c34ee5de8fac3e9af06061b8e6ef7000a252e0360dfd764c81842532d2e",
+      "hash": "0925fcfcbb110f593ecd3cecce8fb83c5ee26fba3aa26ece8ad4dcfb01c99904",
+      "sig": "06f55b25888be2fccc60c678dff4a2973d6b3d7ac73aa71dc0fc11691cb501e152b789555bffc2acadb9c99c36dc6a773d7677d45353d68d91c5950b068bf44e"
+    },
+    {
+      "seq": 2,
+      "ts": 1789000061,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "fan_state",
+      "payload": {
+        "state": "on",
+        "duty": 60,
+        "current_ma": 95
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "0925fcfcbb110f593ecd3cecce8fb83c5ee26fba3aa26ece8ad4dcfb01c99904",
+      "hash": "5e29b1212cd5efefa0db7747b1372d59b36ffd628e0451128474350c82f28b55",
+      "sig": "c301e20a797c88a3cb8a730dac2386b598db6851cabbdfa73f5303269e601bbcf18794abe5525fea1c677d78900e98a5d20302a5da6a52212b14830a7cbe426b"
+    },
+    {
+      "seq": 7,
+      "ts": 1789000951,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "media_captured",
+      "payload": {
+        "trigger": "CRITICAL",
+        "frames": [
+          "7604cb9c9f2487ed9e4c95067fcb608420ce7efac385ee52c96a09f979c74929",
+          "ecaae410a18ab2c0f5288e28f53efbc348ec904eee89e82fc63e569de9879cf7"
+        ],
+        "clip": "3107b21505ec62db0c3c775fe91e667b9e76fa818f20de90721146d0143f979e",
+        "codec": "mjpeg",
+        "resolution": "640x480"
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "b595ca7c47c546ddc382e04bb4798a6ad704bedb38ab2782ab6206d4e30103af",
+      "hash": "9eb8ef671dbea50af9ab641d0c8b15f76f4cfa84d2d7cfc06d42846bcddfdb4e",
+      "sig": "56ae4366da4a854175c20a213fa67cd6c8d1c8ce527a72e77ed367406f03c1debe683adb7a90524e87e07bc19b15a67030e8d4e5710cebb8c2317b86e94415fc"
+    },
+    {
+      "seq": 8,
+      "ts": 1789000952,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "alert_sent",
+      "payload": {
+        "service": "fire",
+        "channel": "sms",
+        "recipient": "station-042",
+        "receipt_id": "r-1001"
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "9eb8ef671dbea50af9ab641d0c8b15f76f4cfa84d2d7cfc06d42846bcddfdb4e",
+      "hash": "cd8fb43c37623782c097cae89b67e885bcaaf50cede9e6850f046d9aa9eb9739",
+      "sig": "42ad579c73c848c3a969b5ded95081ed9e2dffee662d97b8213a17b445b4e584a0deed6d0b6181004c840bec52670d60e733edf5c454b9cc5acec2dec4bdffda"
+    },
+    {
+      "seq": 9,
+      "ts": 1789000952,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "alert_sent",
+      "payload": {
+        "service": "police",
+        "channel": "sms",
+        "recipient": "ps-017",
+        "receipt_id": "r-1002"
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "cd8fb43c37623782c097cae89b67e885bcaaf50cede9e6850f046d9aa9eb9739",
+      "hash": "7369ed3414cc085956d0d333fc88b79fc342ae2e494e6a078388ef65bcbaf47b",
+      "sig": "060f8cd7a2c72e3af9091d3f774c2e4841ee9d64581420bce0e203520daaaae67db9ebfbc501110512c013b53b30a12b6789baedc91917c010ac0c61dcee0fd3"
+    },
+    {
+      "seq": 10,
+      "ts": 1789000952,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "alert_sent",
+      "payload": {
+        "service": "ambulance",
+        "channel": "api",
+        "recipient": "ems-north",
+        "receipt_id": "r-1003"
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "7369ed3414cc085956d0d333fc88b79fc342ae2e494e6a078388ef65bcbaf47b",
+      "hash": "58451d26ee7309cae0334e3c34dc17c9f6f2a8c6fbc917a87462383214da2ff6",
+      "sig": "6ffb568f7dae5f847f2e8b41693034e34732aac22a0f86ca9214f5ea2207e4deb908c4971678755a30ffe65ea53af721b7302b161024e96ecdf53238a0838b52"
+    },
+    {
+      "seq": 11,
+      "ts": 1789000986,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "alert_ack",
+      "payload": {
+        "service": "fire",
+        "receipt_id": "r-1001",
+        "by": "station-042",
+        "latency_s": 34
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "58451d26ee7309cae0334e3c34dc17c9f6f2a8c6fbc917a87462383214da2ff6",
+      "hash": "5c122e40e70e6bc9cf8051e111aa7eb5b3b29059cd43d7f389c801b7e1b3ffbf",
+      "sig": "50a8f0b7f208734dc32e67258f6b73a875cb651f4d5b0e1073eaee3201a506022b65aca4b75a3abe8a28640ad9ee286fd84e1fc15084c9ef7dcebd682af75063"
+    },
+    {
+      "seq": 12,
+      "ts": 1789001012,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "alert_timeout",
+      "payload": {
+        "service": "police",
+        "receipt_id": "r-1002",
+        "elapsed_s": 60,
+        "action": "re_alert"
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "5c122e40e70e6bc9cf8051e111aa7eb5b3b29059cd43d7f389c801b7e1b3ffbf",
+      "hash": "7a2f48ac5eff59228d362052b293f87f4906bf77372b94a470b354377df02838",
+      "sig": "1df77bc82267d4ff11b0f019645a777c53921041d0b418f684bc71a1634ff55a9bdb87c654d38c2f89cf47cbc0e8543a8fccdae81c71e7e1d81f3a7d17fc4b09"
+    }
+  ]
+}

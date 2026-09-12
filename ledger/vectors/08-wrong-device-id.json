@@ -1,0 +1,259 @@
+{
+  "name": "08-wrong-device-id",
+  "description": "Entry 2 was written by a different device and re-signed with that device key.",
+  "expect": {
+    "ok": false,
+    "tier": "signature",
+    "seq": 2
+  },
+  "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEwZqCccii5Gg97E1BiLUeKvcsPEQ7\njQqSENdRQJcLFbFm4e4Stf+9F7i81YfZhygJJclwZlAJvh9W1+HSv31Yow==\n-----END PUBLIC KEY-----\n",
+  "media": [
+    "7604cb9c9f2487ed9e4c95067fcb608420ce7efac385ee52c96a09f979c74929",
+    "ecaae410a18ab2c0f5288e28f53efbc348ec904eee89e82fc63e569de9879cf7",
+    "3107b21505ec62db0c3c775fe91e667b9e76fa818f20de90721146d0143f979e"
+  ],
+  "log": [
+    {
+      "seq": 0,
+      "ts": 1789000000,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "boot",
+      "payload": {
+        "fw_version": "0.1.0-m0",
+        "reset_reason": "power_on",
+        "boot_count": 12
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "32089c34ee5de8fac3e9af06061b8e6ef7000a252e0360dfd764c81842532d2e",
+      "sig": "e41d79b549fde34b3ecaf70a6b14b0b7cefa44e0fea24f7e99f13b1ebccf5f4647b219f5d86388892c3cea82cd942d49eb4089f7f7afcedb3ba8797251372dd3"
+    },
+    {
+      "seq": 1,
+      "ts": 1789000060,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "self_test",
+      "payload": {
+        "result": "pass",
+        "checks": {
+          "heater": true,
+          "buzzer": true,
+          "flame_loopback": true,
+          "fan": true,
+          "camera": true
+        }
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "32089c34ee5de8fac3e9af06061b8e6ef7000a252e0360dfd764c81842532d2e",
+      "hash": "0925fcfcbb110f593ecd3cecce8fb83c5ee26fba3aa26ece8ad4dcfb01c99904",
+      "sig": "06f55b25888be2fccc60c678dff4a2973d6b3d7ac73aa71dc0fc11691cb501e152b789555bffc2acadb9c99c36dc6a773d7677d45353d68d91c5950b068bf44e"
+    },
+    {
+      "seq": 2,
+      "ts": 1789000061,
+      "ts_src": "ntp",
+      "device_id": "7a81889c7ee616f2f9e40446b3d0610a",
+      "type": "fan_state",
+      "payload": {
+        "state": "on",
+        "duty": 60,
+        "current_ma": 95
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "0925fcfcbb110f593ecd3cecce8fb83c5ee26fba3aa26ece8ad4dcfb01c99904",
+      "hash": "ee4497575dbd6a4eeb2c5d80a42408f8780ecf5b28d2b517b0a9a2017c6e7eeb",
+      "sig": "d60aeb6571a01b0600dbd0a5ab6d53524e0086199c2c13e1997e75f5d5540290423c4420fb424a8f9f98af3091f85992d78e5992b1d3f3b2cf3e83aebe5926ca"
+    },
+    {
+      "seq": 3,
+      "ts": 1789000900,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "threshold_cross",
+      "payload": {
+        "modality": "gas",
+        "score": 68,
+        "direction": "up"
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "ee4497575dbd6a4eeb2c5d80a42408f8780ecf5b28d2b517b0a9a2017c6e7eeb",
+      "hash": "124aca74ae727a7173c4aa0bd0c1e67db6c350d666834dbf3d40713ccc971c0e",
+      "sig": "087538d1e376f5d55015ad8cc4720252cbd208b9a118204d6831fb6ca9fbaf97a9b024ec573c6d0435585e617e04997928b8cd49b928523de35ebd101c9f3bfe"
+    },
+    {
+      "seq": 4,
+      "ts": 1789000905,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "state_change",
+      "payload": {
+        "from": "NORMAL",
+        "to": "ELEVATED",
+        "reason": [
+          "gas"
+        ],
+        "scores": {
+          "gas": 68,
+          "smoke": 21,
+          "flame": 0,
+          "heat": 12,
+          "humidity": 44
+        }
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "124aca74ae727a7173c4aa0bd0c1e67db6c350d666834dbf3d40713ccc971c0e",
+      "hash": "75757c3bcc3920f592789ad74bb5771fc5cfeed8a441c240128e9b35a9c1bbec",
+      "sig": "af76d141318fdd67bc7458d19dace3d36aedeefd293bf9a3cd9e4ffca405463305635c726f4f73a21a2ac0dcf00436ef3aef3eae2dfd49fdca6ec6d73da272ee"
+    },
+    {
+      "seq": 5,
+      "ts": 1789000940,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "threshold_cross",
+      "payload": {
+        "modality": "heat",
+        "score": 64,
+        "direction": "up"
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "75757c3bcc3920f592789ad74bb5771fc5cfeed8a441c240128e9b35a9c1bbec",
+      "hash": "ea425a7f312d2b8def9db04a2e3017cffa1347e60cf96db1b957fc47fc85602d",
+      "sig": "f04c606ab46c34cf55a2d9538f908dc788a74f8705089235f9998eae5c44672788d11ac4527e7809d7e1959ba7af17cc93c14ed4d989dee1b687fa98c59294eb"
+    },
+    {
+      "seq": 6,
+      "ts": 1789000950,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "state_change",
+      "payload": {
+        "from": "ELEVATED",
+        "to": "CRITICAL",
+        "reason": [
+          "gas",
+          "heat"
+        ],
+        "scores": {
+          "gas": 81,
+          "smoke": 35,
+          "flame": 0,
+          "heat": 64,
+          "humidity": 41
+        }
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "ea425a7f312d2b8def9db04a2e3017cffa1347e60cf96db1b957fc47fc85602d",
+      "hash": "4d39631f27d22571590fd13c545a57add0d1f1b0f0f41cd7268134779c520c43",
+      "sig": "e47054ff7145864cf039426613303878a310308e18fad4ccdce123994c0e1decd62548e82d08e2115b5159e014466841bc763a225129e1ba6616e46275d429ef"
+    },
+    {
+      "seq": 7,
+      "ts": 1789000951,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "media_captured",
+      "payload": {
+        "trigger": "CRITICAL",
+        "frames": [
+          "7604cb9c9f2487ed9e4c95067fcb608420ce7efac385ee52c96a09f979c74929",
+          "ecaae410a18ab2c0f5288e28f53efbc348ec904eee89e82fc63e569de9879cf7"
+        ],
+        "clip": "3107b21505ec62db0c3c775fe91e667b9e76fa818f20de90721146d0143f979e",
+        "codec": "mjpeg",
+        "resolution": "640x480"
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "4d39631f27d22571590fd13c545a57add0d1f1b0f0f41cd7268134779c520c43",
+      "hash": "8beb4812a0443669f5f8397208351f6c89fb8b35a741bbec56ee323f0580af09",
+      "sig": "8ab0b4ac1e0bbe3f75d7268b2e0e9d9c9d0e19e97c5a19d80ec85a588d346bd39414c21054cfdb26bcf7f3ad5fab67cb18ee1700de3f50744c8aa13ba9c25701"
+    },
+    {
+      "seq": 8,
+      "ts": 1789000952,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "alert_sent",
+      "payload": {
+        "service": "fire",
+        "channel": "sms",
+        "recipient": "station-042",
+        "receipt_id": "r-1001"
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "8beb4812a0443669f5f8397208351f6c89fb8b35a741bbec56ee323f0580af09",
+      "hash": "29aee64cab12003321083aa737ea74bb5197b76013d2284a6989761fe6f23a4d",
+      "sig": "da1d5b6471a70735fef3be187a26a9a010423d3e8392131cac434e27226f55504ed13f333d56c4f7bf1f699e6316c3bc4026d480869cbd9195639c977a182524"
+    },
+    {
+      "seq": 9,
+      "ts": 1789000952,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "alert_sent",
+      "payload": {
+        "service": "police",
+        "channel": "sms",
+        "recipient": "ps-017",
+        "receipt_id": "r-1002"
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "29aee64cab12003321083aa737ea74bb5197b76013d2284a6989761fe6f23a4d",
+      "hash": "47757a3eef1ae3937945b3bcfe8e301813cb362127ec6abc34ecc9be86fea218",
+      "sig": "c0a3ec7b46f7dedb8877722cc1a5dea5bfd7f28c8eaf8bdedef6844fe5b1807595d2c7b86da68537cda84cb52cdc3019bc2184c1f027986ecd6e6873aede1d1d"
+    },
+    {
+      "seq": 10,
+      "ts": 1789000952,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "alert_sent",
+      "payload": {
+        "service": "ambulance",
+        "channel": "api",
+        "recipient": "ems-north",
+        "receipt_id": "r-1003"
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "47757a3eef1ae3937945b3bcfe8e301813cb362127ec6abc34ecc9be86fea218",
+      "hash": "8fa9fe69bdfefa3ea2933abaf10d347407ccd77dada84e6c6d23d35eb8540b35",
+      "sig": "d31ab1630662c6c2819e2de7f2f8e2767c0bb290ae81674f7b4e7622b01089e2cd731de46508e9ba7027e4f32b658e3f4559d8b3de83cb155d5eef605558d560"
+    },
+    {
+      "seq": 11,
+      "ts": 1789000986,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "alert_ack",
+      "payload": {
+        "service": "fire",
+        "receipt_id": "r-1001",
+        "by": "station-042",
+        "latency_s": 34
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "8fa9fe69bdfefa3ea2933abaf10d347407ccd77dada84e6c6d23d35eb8540b35",
+      "hash": "10467d33d98392b342ee75b8231440a9149f0ab770484dd10d5123c641f17955",
+      "sig": "fb2d95be2084ca7362aa4eb0b14eb2cb12cb09dea647fe12ad525812e046b5606d5a9bb6a146d439cfa949ba217f47430af6c9e2080843727d08385b4c6bb420"
+    },
+    {
+      "seq": 12,
+      "ts": 1789001012,
+      "ts_src": "ntp",
+      "device_id": "6d70642010849d0c483ec2af8e76f1ae",
+      "type": "alert_timeout",
+      "payload": {
+        "service": "police",
+        "receipt_id": "r-1002",
+        "elapsed_s": 60,
+        "action": "re_alert"
+      },
+      "fw_hash": "8238989e439682d94aea8ea9e541da6c045da9a2bf82dae9a66a66ca52d5b6d6",
+      "prev_hash": "10467d33d98392b342ee75b8231440a9149f0ab770484dd10d5123c641f17955",
+      "hash": "2ba6c9f72a6f89cb89269e8bc5b81ae4a993c8f8f0aaa352533bab82f825712e",
+      "sig": "a015028c3af402769b423e2592984f9fa5357a18f14609438a2efb2561d728dcbfe1a3c4f696d39c451f157529dedb0f63401384ddc1afb0472bdd8cba1d3cff"
+    }
+  ]
+}

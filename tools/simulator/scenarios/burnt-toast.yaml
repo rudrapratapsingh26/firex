@@ -1,0 +1,25 @@
+# Burnt toast: the nuisance that gets detectors unplugged. Smoke spikes hard,
+# nothing else agrees, and the node must stay at ELEVATED without ever sounding
+# a critical alarm. NFPA attributes 73% of disabling nuisance alarms to cooking.
+name: burnt toast
+description: A sharp smoke spike with no gas and no real heat rise. Must reach ELEVATED and never CRITICAL.
+duration_s: 240
+interval_s: 2
+warmup_s: 0
+
+channels:
+  smoke:
+    - { until: 40,  from: 0.05, to: 0.78 }
+    - { until: 110, from: 0.78, to: 0.70 }
+    - { until: 240, from: 0.70, to: 0.10 }
+  smoke_noise: 0.03
+  gas:
+    - { until: 60,  from: 0.05, to: 0.22 }
+    - { until: 240, from: 0.22, to: 0.08 }
+  heat:
+    - { until: 60,  from: 0.05, to: 0.22 }   # a toaster warms the air a little
+    - { until: 240, from: 0.22, to: 0.10 }
+  humidity: 0.40
+  flame: 0.0
+
+expect: [NORMAL, ELEVATED]

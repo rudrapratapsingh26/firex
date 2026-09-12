@@ -1,0 +1,24 @@
+{
+  "name": "firex",
+  "private": true,
+  "type": "module",
+  "description": "FireX monorepo: node firmware, site gateway, ledger and verifier, simulator.",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "vectors": "node --experimental-strip-types ledger/src/vectors.ts",
+    "verify": "node --experimental-strip-types ledger/src/cli.ts verify",
+    "demo": "node --experimental-strip-types ledger/src/cli.ts demo",
+    "demo:escalation": "node --experimental-strip-types gateway/escalation/demo.ts",
+    "fusion:test": "make -C firmware test",
+    "fusion:lib": "make -C firmware lib",
+    "sim": "python tools/simulator/simulate.py"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

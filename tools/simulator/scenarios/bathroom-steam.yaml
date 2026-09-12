@@ -1,0 +1,24 @@
+# Hot shower in a hostel bathroom. MQ-series gas sensors read high in humid air,
+# so without the humidity context rule this trace alarms. With it, the gas score
+# is damped while humidity is high and nothing is getting hotter.
+name: bathroom steam
+description: High humidity lifts the gas channel with no heat rise. The steam rule must keep this at NORMAL.
+duration_s: 240
+interval_s: 2
+warmup_s: 0
+
+channels:
+  humidity:
+    - { until: 40,  from: 0.45, to: 0.92 }
+    - { until: 200, from: 0.92, to: 0.94 }
+    - { until: 240, from: 0.94, to: 0.60 }
+  gas:
+    - { until: 50,  from: 0.10, to: 0.72 }   # humid air, not a leak
+    - { until: 200, from: 0.72, to: 0.75 }
+    - { until: 240, from: 0.75, to: 0.20 }
+  gas_noise: 0.02
+  smoke: 0.12
+  heat: 0.08
+  flame: 0.0
+
+expect: [NORMAL]
