@@ -1,7 +1,7 @@
 # ADR 0001 — TypeScript runs without a build step in M0
 
 Date: 2026-09-12
-Status: accepted, revisit at M3
+Status: accepted; revisited at M3 and kept, see ADR 0005
 
 ## Context
 

@@ -1,0 +1,31 @@
+# The closed-room LPG leak again, with the fan stopped. Without airflow the gas
+# reaches the MQ-2 late, so heat is the first voter and CRITICAL waits for gas
+# to catch up. Compare its time to alarm with gas-leak-closed-room.yaml; the
+# bench number comes from the M1 fan-on versus fan-off curve. Made-up numbers.
+name: gas leak, fan failed
+description: The gas leak with a slower gas rise and the fan reporting failed. Should still reach CRITICAL, later.
+duration_s: 360
+interval_s: 2
+warmup_s: 0
+
+channels:
+  gas:
+    - { until: 120, from: 0.05, to: 0.15 }
+    - { until: 300, from: 0.15, to: 0.66 }
+    - { until: 360, from: 0.66, to: 0.74 }
+  gas_noise: 0.02
+  smoke:
+    - { until: 180, from: 0.05, to: 0.18 }
+    - { until: 360, from: 0.18, to: 0.50 }
+  heat:
+    - { until: 200, from: 0.05, to: 0.10 }
+    - { until: 240, from: 0.10, to: 0.72 }
+    - { until: 360, from: 0.72, to: 0.88 }
+  humidity: 0.35
+  flame: 0.0
+
+fan: { duty: 100, rpm: 0, state: failed }
+
+expect: [NORMAL, ELEVATED, CRITICAL]
+
+trial: { class: hazard, name: gas-lpg-fanfail, start_s: 0, end_s: 360 }

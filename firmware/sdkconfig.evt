@@ -1,0 +1,23 @@
+# FireX EVT PCB (M6), layered on sdkconfig.defaults:
+#
+#   idf.py -B build-evt -D SDKCONFIG=build-evt/sdkconfig \
+#          -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.evt" set-target esp32s3 build
+#
+# This is the development EVT image: no eFuses are burned by it. The production image adds
+# sdkconfig.production. The pin map is provisional until the schematic exists
+# (FIREX_BOARD_EVT in main/Kconfig.projbuild).
+CONFIG_FIREX_BOARD_EVT=y
+CONFIG_FIREX_HEAT_NTC=y
+CONFIG_FIREX_KEY_ATECC608B=y
+
+# A blank ATECC608B (TrustCUSTOM), configured and locked by FireX at the factory
+# (docs/adr/0008-secure-element.md), on its own I2C bus.
+CONFIG_ATECC608A_TCUSTOM=y
+CONFIG_ATCA_I2C_SDA_PIN=21
+CONFIG_ATCA_I2C_SCL_PIN=47
+CONFIG_ATCA_I2C_ADDRESS=0xC0
+
+# With secure boot v2 and flash encryption the bootloader is 0xA000 bytes, past the default
+# partition table offset of 0x8000. The EVT table starts at 0x10000, for both EVT images.
+CONFIG_PARTITION_TABLE_OFFSET=0x10000
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions_evt.csv"

@@ -1,0 +1,4 @@
+## LittleFS for the ledger and media partitions.
+dependencies:
+  idf: ">=5.3"
+  joltwallet/littlefs: "^1.22.3"

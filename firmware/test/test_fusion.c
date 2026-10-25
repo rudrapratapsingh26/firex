@@ -241,6 +241,101 @@ static void test_a_gas_leak_walks_normal_elevated_critical(void)
     TEST_ASSERT_EQUAL_INT(FX_STATE_CRITICAL, critical.state);
 }
 
+/* --- the metal-oxide pair ---------------------------------------------- */
+
+static void init_without_mos_pair(void)
+{
+    fx_config_t cfg;
+    fx_config_defaults(&cfg);
+    cfg.mos_pair = false;
+    fx_init(&eng, &cfg, 0);
+}
+
+static void test_by_default_gas_and_smoke_are_a_critical_pair(void)
+{
+    fx_config_t cfg;
+    fx_config_defaults(&cfg);
+    TEST_ASSERT_TRUE(cfg.mos_pair);
+    run_until(0, WARM);
+    samples[FX_GAS].score = 0.7f;
+    samples[FX_SMOKE].score = 0.7f;
+    fx_result_t r = run_until(WARM + 1000u, WARM + 12000u);
+    TEST_ASSERT_EQUAL_INT(FX_STATE_CRITICAL, r.state);
+    TEST_ASSERT_EQUAL_INT(FX_GAS, r.reason_a);
+    TEST_ASSERT_EQUAL_INT(FX_SMOKE, r.reason_b);
+}
+
+static void test_without_the_pair_gas_and_smoke_stay_elevated(void)
+{
+    init_without_mos_pair();
+    run_until(0, WARM);
+    samples[FX_GAS].score = 0.8f; /* an aerosol propellant drives both metal-oxide sensors */
+    samples[FX_SMOKE].score = 0.8f;
+    fx_result_t r = run_until(WARM + 1000u, WARM + 60000u);
+    TEST_ASSERT_EQUAL_INT(FX_STATE_ELEVATED, r.state);
+    TEST_ASSERT_EQUAL_INT(2, r.voter_count);
+}
+
+static void test_without_the_pair_heat_completes_it_and_is_named(void)
+{
+    init_without_mos_pair();
+    run_until(0, WARM);
+    samples[FX_GAS].score = 0.7f;
+    samples[FX_SMOKE].score = 0.7f;
+    samples[FX_HEAT].score = 0.7f;
+    fx_result_t r = run_until(WARM + 1000u, WARM + 12000u);
+    TEST_ASSERT_EQUAL_INT(FX_STATE_CRITICAL, r.state);
+    TEST_ASSERT_EQUAL_INT(FX_GAS, r.reason_a);
+    TEST_ASSERT_EQUAL_INT(FX_HEAT, r.reason_b);
+}
+
+static void test_without_the_pair_smoke_and_heat_are_unaffected(void)
+{
+    init_without_mos_pair();
+    run_until(0, WARM);
+    samples[FX_SMOKE].score = 0.7f;
+    samples[FX_HEAT].score = 0.7f;
+    fx_result_t r = run_until(WARM + 1000u, WARM + 12000u);
+    TEST_ASSERT_EQUAL_INT(FX_STATE_CRITICAL, r.state);
+    TEST_ASSERT_EQUAL_INT(FX_SMOKE, r.reason_a);
+    TEST_ASSERT_EQUAL_INT(FX_HEAT, r.reason_b);
+}
+
+/* --- the DHT22 sampling floor ----------------------------------------- */
+
+#define DHT22_FLOOR 2000u /* FX_DHT22_FLOOR_MS in components/sensors */
+
+static void test_default_rules_respect_the_dht22_floor(void)
+{
+    fx_config_t cfg;
+    fx_config_defaults(&cfg);
+    TEST_ASSERT_TRUE(fx_config_check(&cfg, DHT22_FLOOR));
+}
+
+static void test_a_dwell_shorter_than_the_floor_is_rejected(void)
+{
+    fx_config_t cfg;
+    fx_config_defaults(&cfg);
+    cfg.elevated_ms = 1000u;
+    TEST_ASSERT_FALSE(fx_config_check(&cfg, DHT22_FLOOR));
+    fx_config_defaults(&cfg);
+    cfg.exit = cfg.enter;
+    TEST_ASSERT_FALSE(fx_config_check(&cfg, DHT22_FLOOR));
+}
+
+static void test_rules_hold_when_fed_at_the_dht22_floor(void)
+{
+    run_until(0, WARM);
+    samples[FX_GAS].score = 0.7f;
+    samples[FX_HEAT].score = 0.7f;
+    fx_result_t r;
+    memset(&r, 0, sizeof(r));
+    for (uint32_t t = WARM + DHT22_FLOOR; t <= WARM + 12000u; t += DHT22_FLOOR) {
+        r = fx_update(&eng, samples, t);
+    }
+    TEST_ASSERT_EQUAL_INT(FX_STATE_CRITICAL, r.state);
+}
+
 int main(void)
 {
     UNITY_BEGIN();
@@ -263,5 +358,12 @@ int main(void)
     RUN_TEST(test_steam_does_not_suppress_gas_once_heat_rises);
     RUN_TEST(test_state_changed_is_reported_once_per_transition);
     RUN_TEST(test_a_gas_leak_walks_normal_elevated_critical);
+    RUN_TEST(test_by_default_gas_and_smoke_are_a_critical_pair);
+    RUN_TEST(test_without_the_pair_gas_and_smoke_stay_elevated);
+    RUN_TEST(test_without_the_pair_heat_completes_it_and_is_named);
+    RUN_TEST(test_without_the_pair_smoke_and_heat_are_unaffected);
+    RUN_TEST(test_default_rules_respect_the_dht22_floor);
+    RUN_TEST(test_a_dwell_shorter_than_the_floor_is_rejected);
+    RUN_TEST(test_rules_hold_when_fed_at_the_dht22_floor);
     return UNITY_END();
 }

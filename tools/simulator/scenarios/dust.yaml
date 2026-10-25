@@ -1,0 +1,25 @@
+# Sweeping a dusty room. FireX has no optical smoke chamber, so dust should
+# barely register: the MQ heaters see a small bump from whatever the dust
+# carries, and nothing else moves. Made-up numbers; the bench says how small.
+name: dust
+description: A small gas and smoke bump from sweeping, well under threshold. Must stay NORMAL.
+duration_s: 240
+interval_s: 2
+warmup_s: 0
+
+channels:
+  gas:
+    - { until: 60,  from: 0.06, to: 0.14 }
+    - { until: 240, from: 0.14, to: 0.07 }
+  gas_noise: 0.02
+  smoke:
+    - { until: 60,  from: 0.07, to: 0.20 }
+    - { until: 240, from: 0.20, to: 0.08 }
+  smoke_noise: 0.02
+  heat: 0.07
+  humidity: 0.42
+  flame: 0.0
+
+expect: [NORMAL]
+
+trial: { class: nuisance, name: dust-sweeping, start_s: 0, end_s: 120 }

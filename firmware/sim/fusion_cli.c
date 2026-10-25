@@ -9,7 +9,8 @@
  *               sim/fusion_cli.c -o build/fusion_cli
  *
  *   stdin:  config <enter> <exit> <elevated_ms> <critical_ms> <flame_alone>
- *                  <flame_score> <flame_ms> <warmup_ms> <rh> <heat_quiet> <gas_suppress>
+ *                  <flame_score> <flame_ms> <warmup_ms> <rh> <heat_quiet> <gas_suppress> [<mos_pair>]
+ *                  (mos_pair, 0 or 1, is optional and defaults to 1)
  *           step <t_ms> <s0> <v0> ... <s4> <v4>
  *   stdout: <state> <changed> <fault> <voters> <voter_count> <a> <b> <eff0..eff4>
  */
@@ -31,17 +32,19 @@ int main(void)
 
     while (fgets(line, sizeof(line), stdin)) {
         if (strncmp(line, "config", 6) == 0) {
-            int flame_alone = 1;
+            int flame_alone = 1, mos_pair = 1;
             unsigned elevated_ms = 0, critical_ms = 0, flame_ms = 0, warmup_ms = 0;
-            if (sscanf(line + 6, "%f %f %u %u %d %f %u %u %f %f %f",
-                       &cfg.enter, &cfg.exit, &elevated_ms, &critical_ms, &flame_alone,
-                       &cfg.flame_alone_score, &flame_ms, &warmup_ms,
-                       &cfg.rh_context, &cfg.heat_quiet, &cfg.gas_suppress) == 11) {
+            const int got = sscanf(line + 6, "%f %f %u %u %d %f %u %u %f %f %f %d",
+                                   &cfg.enter, &cfg.exit, &elevated_ms, &critical_ms, &flame_alone,
+                                   &cfg.flame_alone_score, &flame_ms, &warmup_ms,
+                                   &cfg.rh_context, &cfg.heat_quiet, &cfg.gas_suppress, &mos_pair);
+            if (got == 11 || got == 12) {
                 cfg.elevated_ms = elevated_ms;
                 cfg.critical_ms = critical_ms;
                 cfg.flame_alone_ms = flame_ms;
                 cfg.warmup_ms = warmup_ms;
                 cfg.flame_alone = flame_alone ? true : false;
+                cfg.mos_pair = mos_pair ? true : false;
                 fx_init(&engine, &cfg, 0);
                 printf("ok\n"); fflush(stdout);
             } else {

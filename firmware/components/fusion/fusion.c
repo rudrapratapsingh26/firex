@@ -7,6 +7,13 @@ static bool votes(fx_modality_t m)
     return m != FX_HUMIDITY;
 }
 
+/* MQ-2 and MQ-135 are both heated metal-oxide sensors: one sensing physics,
+ * and an aerosol propellant drives both. */
+static bool metal_oxide(fx_modality_t m)
+{
+    return m == FX_GAS || m == FX_SMOKE;
+}
+
 static uint32_t dwell(uint32_t now_ms, uint32_t since_ms)
 {
     return now_ms - since_ms; /* unsigned arithmetic wraps correctly */
@@ -28,6 +35,7 @@ void fx_config_defaults(fx_config_t *cfg)
     cfg->rh_context = 0.75f;
     cfg->heat_quiet = 0.30f;
     cfg->gas_suppress = 0.50f;
+    cfg->mos_pair = true;
 }
 
 void fx_init(fx_engine_t *e, const fx_config_t *cfg, uint32_t now_ms)
@@ -117,6 +125,7 @@ fx_result_t fx_update(fx_engine_t *e, const fx_sample_t samples[FX_MODALITY_COUN
     uint8_t elevated_votes = 0;
     uint8_t critical_votes = 0;
     fx_modality_t first = FX_MODALITY_COUNT, second = FX_MODALITY_COUNT;
+    fx_modality_t other_physics = FX_MODALITY_COUNT; /* first critical voter that is not metal-oxide */
 
     for (int i = 0; i < FX_MODALITY_COUNT; i++) {
         if (!e->active[i] || !votes((fx_modality_t)i)) {
@@ -133,9 +142,24 @@ fx_result_t fx_update(fx_engine_t *e, const fx_sample_t samples[FX_MODALITY_COUN
             } else if (second == FX_MODALITY_COUNT) {
                 second = (fx_modality_t)i;
             }
+            if (other_physics == FX_MODALITY_COUNT && !metal_oxide((fx_modality_t)i)) {
+                other_physics = (fx_modality_t)i;
+            }
         }
     }
     r.voter_count = critical_votes;
+
+    /* Without the metal-oxide pair, gas and smoke agreeing is one physics
+     * agreeing with itself: the pair must include flame or heat, and the
+     * reasons name it. */
+    bool agreement = critical_votes >= 2;
+    if (agreement && !e->cfg.mos_pair && metal_oxide(first) && metal_oxide(second)) {
+        if (other_physics == FX_MODALITY_COUNT) {
+            agreement = false;
+        } else {
+            second = other_physics;
+        }
+    }
 
     /* 4. Flame on its own may raise CRITICAL: IR flicker detection is
      *    high-specificity, and waiting for a second modality on an open flame
@@ -149,9 +173,10 @@ fx_result_t fx_update(fx_engine_t *e, const fx_sample_t samples[FX_MODALITY_COUN
 
     /* 5. Decide the state. Two *different* modalities are required, which is
      *    why gas and smoke are separate sensors rather than two thresholds on
-     *    one MQ part. */
+     *    one MQ part; mos_pair decides whether those two sensors may be the
+     *    pair on their own. */
     fx_state_t target = FX_STATE_NORMAL;
-    if (critical_votes >= 2) {
+    if (agreement) {
         target = FX_STATE_CRITICAL;
         r.reason_a = first;
         r.reason_b = second;
@@ -175,6 +200,24 @@ fx_result_t fx_update(fx_engine_t *e, const fx_sample_t samples[FX_MODALITY_COUN
     }
     r.state = e->state;
     return r;
+}
+
+bool fx_config_check(const fx_config_t *cfg, uint32_t sample_floor_ms)
+{
+    if (!cfg) {
+        return false;
+    }
+    if (!(cfg->enter > 0.0f && cfg->enter <= 1.0f) || !(cfg->exit >= 0.0f && cfg->exit < cfg->enter)) {
+        return false;
+    }
+    if (cfg->elevated_ms < sample_floor_ms || cfg->critical_ms < sample_floor_ms ||
+        cfg->critical_ms < cfg->elevated_ms) {
+        return false;
+    }
+    if (cfg->flame_alone && cfg->flame_alone_ms < sample_floor_ms) {
+        return false;
+    }
+    return true;
 }
 
 const char *fx_state_name(fx_state_t s)

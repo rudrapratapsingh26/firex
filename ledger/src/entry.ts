@@ -15,12 +15,20 @@ export type EventType =
   | 'boot' | 'self_test' | 'threshold_cross' | 'state_change' | 'config_change'
   | 'calibration' | 'silence' | 'heartbeat_gap' | 'clock_sync' | 'anchor_ack'
   // new in v0.2
-  | 'media_captured' | 'alert_sent' | 'alert_ack' | 'alert_timeout' | 'fan_state';
+  | 'media_captured' | 'alert_sent' | 'alert_ack' | 'alert_timeout' | 'fan_state'
+  // new in v0.3
+  | 'fault'
+  // new in v0.4
+  | 'log_overwrite'
+  // new in v0.5: fw_update and trace_captured from a unit; the rest only in a site chain
+  | 'fw_update' | 'trace_captured'
+  | 'incident_label' | 'drill' | 'registry_change' | 'fw_offered' | 'unit_removed' | 'escalation_withheld';
 
 export interface EntryBody {
   seq: number;
   ts: number;
-  ts_src: 'ntp' | 'rtc' | 'uncertain';
+  /** `gateway` (v0.5): a unit's clock set from its site gateway over the authenticated MQTT link. */
+  ts_src: 'ntp' | 'rtc' | 'uncertain' | 'gateway';
   device_id: Uint8Array;
   type: EventType;
   payload: Record<string, CborValue>;
@@ -123,7 +131,7 @@ function payloadToJson(payload: Record<string, CborValue>): Record<string, unkno
 }
 
 /** Byte-string payload fields, so JSON round-trips back to identical CBOR. */
-const BSTR_FIELDS = new Set(['root', 'clip']);
+const BSTR_FIELDS = new Set(['root', 'clip', 'image', 'trace', 'critical_hash', 'old_registry', 'new_registry']);
 const BSTR_ARRAY_FIELDS = new Set(['frames']);
 
 function payloadFromJson(payload: Record<string, unknown>): Record<string, CborValue> {
@@ -181,6 +189,12 @@ export class LedgerWriter {
     this.deviceId = deviceId;
     this.fwHash = fwHash;
     this.privateKey = privateKey;
+  }
+
+  /** Continue a chain whose newest entry is already stored elsewhere (a restarted writer). */
+  resume(nextSeq: number, prevHash: Uint8Array): void {
+    this.seq = nextSeq;
+    this.prev = prevHash;
   }
 
   append(type: EventType, payload: Record<string, CborValue>, ts: number, tsSrc: EntryBody['ts_src'] = 'ntp'): Entry {

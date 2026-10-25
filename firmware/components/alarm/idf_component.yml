@@ -1,0 +1,4 @@
+## WS2812 status ring driver.
+dependencies:
+  idf: ">=5.3"
+  espressif/led_strip: "^3.0.3"

@@ -1,0 +1,33 @@
+# Frying onions in a hostel pantry: oil smoke, a warm pan, steam off the food.
+# Smoke crosses the threshold and the heat channel creeps up without crossing,
+# which is exactly the margin M4 has to measure on the bench: a hotter pan or a
+# lower heat threshold turns this into smoke + heat agreeing. Made-up numbers.
+name: cooking, frying
+description: Smoke above threshold, heat rising but under it, humid air. Must reach ELEVATED and never CRITICAL.
+duration_s: 420
+interval_s: 2
+warmup_s: 0
+
+channels:
+  smoke:
+    - { until: 60,  from: 0.05, to: 0.55 }
+    - { until: 240, from: 0.55, to: 0.70 }
+    - { until: 420, from: 0.70, to: 0.12 }
+  smoke_noise: 0.03
+  heat:
+    - { until: 90,  from: 0.05, to: 0.42 }
+    - { until: 240, from: 0.42, to: 0.48 }   # the closest this nuisance comes to a second voter
+    - { until: 420, from: 0.48, to: 0.15 }
+  humidity:
+    - { until: 60,  from: 0.45, to: 0.78 }
+    - { until: 240, from: 0.78, to: 0.80 }
+    - { until: 420, from: 0.80, to: 0.50 }
+  gas:
+    - { until: 120, from: 0.05, to: 0.35 }
+    - { until: 420, from: 0.35, to: 0.10 }
+  gas_noise: 0.02
+  flame: 0.0
+
+expect: [NORMAL, ELEVATED]
+
+trial: { class: nuisance, name: cooking-frying, start_s: 2, end_s: 240 }

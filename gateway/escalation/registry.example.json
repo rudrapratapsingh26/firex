@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "site_id": "site-001",
+  "site_name": "Hostel, Block B",
+  "address": "Block B, example campus",
+  "location": { "lat": 0.0, "lon": 0.0 },
+  "ack_timeout_s": 60,
+  "max_realerts": 1,
+  "offline_notify_min": 10,
+  "contacts": [
+    { "service": "site", "name": "Warden on duty", "recipient": "+910000000001", "channel": "sms", "mode": "live" },
+    {
+      "service": "fire", "name": "Fire station 42", "recipient": "+910000000042", "channel": "sms", "mode": "drill",
+      "backup": { "name": "Fire station 17", "recipient": "+910000000017", "channel": "voice" }
+    },
+    { "service": "police", "name": "Police station 17", "recipient": "+910000000117", "channel": "sms", "mode": "drill" },
+    { "service": "ambulance", "name": "EMS north", "recipient": "+910000000210", "channel": "sms", "mode": "drill" }
+  ]
+}

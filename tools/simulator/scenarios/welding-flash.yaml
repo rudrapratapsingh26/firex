@@ -23,6 +23,11 @@ channels:
   humidity: 0.30
 
 expect: [NORMAL, CRITICAL]
+
+# Category "other": an arc is a workshop case, not one of the six rows of the M4
+# nuisance matrix. Filing it under sunlight would make that row look worse
+# because of a source the bench matrix never presents.
+trial: { class: nuisance, name: welding-arc, start_s: 28, end_s: 100 }
 note: >
   Known false positive. Switching flame_alone off in fx_config_t holds this at
   NORMAL, at the cost of waiting for a second modality on a real open flame.

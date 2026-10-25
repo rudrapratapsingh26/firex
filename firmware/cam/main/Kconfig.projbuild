@@ -1,0 +1,36 @@
+menu "FireX camera"
+
+    comment "AI-Thinker ESP32-CAM. GPIO 13 and 14 are free when no SD card is used."
+
+    config FIREX_CAM_LINK_TX_GPIO
+        int "Node link TX GPIO (to the node's RX)"
+        range 0 39
+        default 14
+
+    config FIREX_CAM_LINK_RX_GPIO
+        int "Node link RX GPIO (from the node's TX)"
+        range 0 39
+        default 13
+
+    config FIREX_CAM_LINK_BAUD
+        int "Node link baud rate"
+        default 460800
+
+    config FIREX_CAM_PRODUCTION
+        bool "Production image (M6): the bench shutter cannot be selected"
+        default n
+        help
+            Set by sdkconfig.production, together with secure boot v2, flash encryption
+            and a disabled ROM loader, so the console refusal of SNAP cannot be flashed away.
+
+    config FIREX_CAM_BENCH_SHUTTER
+        bool "BENCH ONLY: allow SNAP from the USB console"
+        depends on !FIREX_CAM_PRODUCTION
+        default n
+        help
+            Lets tools/camera/pull_jpeg.py take a photo on demand over USB. That is a
+            remote shutter, which docs/media-policy.md forbids on any unit that can see
+            people. Every banner of an image built with this on says "bench". Leave it
+            off for anything but a test scene on a developer's bench.
+
+endmenu

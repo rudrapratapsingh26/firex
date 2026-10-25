@@ -1,0 +1,31 @@
+# Paper catching in a waste bin: an open flame from the first seconds, smoke
+# and heat building behind it. The flame-alone rule is what makes this fast;
+# with fx_flame_alone 0 it waits for smoke to agree. Made-up numbers.
+name: open flame
+description: A flame appears at 20 s and stays, smoke and heat follow. CRITICAL within seconds on flame alone.
+duration_s: 180
+interval_s: 2
+warmup_s: 0
+
+channels:
+  flame:
+    - { until: 20,  from: 0.0,  to: 0.0 }
+    - { until: 22,  from: 0.0,  to: 0.95 }
+    - { until: 180, from: 0.95, to: 0.96 }
+  flame_noise: 0.02
+  smoke:
+    - { until: 40,  from: 0.05, to: 0.10 }
+    - { until: 120, from: 0.10, to: 0.66 }
+    - { until: 180, from: 0.66, to: 0.75 }
+  heat:
+    - { until: 40,  from: 0.05, to: 0.10 }
+    - { until: 150, from: 0.10, to: 0.62 }
+    - { until: 180, from: 0.62, to: 0.70 }
+  gas:
+    - { until: 60,  from: 0.08, to: 0.12 }
+    - { until: 180, from: 0.12, to: 0.40 }
+  humidity: 0.40
+
+expect: [NORMAL, CRITICAL]
+
+trial: { class: hazard, name: flame-wastebin, start_s: 20, end_s: 180 }

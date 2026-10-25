@@ -1,0 +1,43 @@
+dependencies:
+  espressif/esp-cryptoauthlib:
+    component_hash: a71b50c5693d8987ae531c342e414edfeaf09ef188c588e1b32b7c83e4a75a5a
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=4.3'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 3.7.9~2
+  espressif/led_strip:
+    component_hash: 28621486f77229aaf81c71f5e15d6fbf36c2949cf11094e07090593e659e7639
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=5.0'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 3.0.3
+  idf:
+    source:
+      type: idf
+    version: 5.5.5
+  joltwallet/littlefs:
+    component_hash: 3af20a3d75c49db9dc2286fd50862c34055c9f578419ad1f2bf7ed3ed01391fe
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=5.0'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.22.3
+direct_dependencies:
+- espressif/esp-cryptoauthlib
+- espressif/led_strip
+- idf
+- joltwallet/littlefs
+manifest_hash: e2f21019bf7d1e9f89614f0b26b4bab07baee851dde5d1b33db1d72ae0138a17
+target: esp32s3
+version: 2.0.0

@@ -1,0 +1,16 @@
+# FireX topic access. %u is the CN of the client certificate.
+# gateway/test/e2e.test.ts applies the same rules to its in-process broker.
+
+# The gateway reads every node topic and sends commands.
+user firex-server
+topic read firex/#
+topic write firex/+/+/cmd
+
+# A node writes only under its own device_id, and reads only its own commands.
+pattern write firex/+/%u/hello
+pattern write firex/+/%u/state
+pattern write firex/+/%u/telemetry
+pattern write firex/+/%u/ledger
+pattern write firex/+/%u/media/+
+pattern write firex/+/%u/trace/+
+pattern read firex/+/%u/cmd

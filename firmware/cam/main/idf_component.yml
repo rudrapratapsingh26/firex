@@ -1,0 +1,5 @@
+## Resolved by the ESP-IDF component manager on the first build; the resolved
+## versions are pinned in dependencies.lock, which is committed.
+dependencies:
+  idf: ">=5.3"
+  espressif/esp32-camera: "^2.0.0"

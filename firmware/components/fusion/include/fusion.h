@@ -10,6 +10,8 @@
  *   one modality  >= 0.60 held for  5 s  -> ELEVATED
  *   two modalities>= 0.60 held for 10 s  -> CRITICAL   (different sensing physics)
  *   flame         >= 0.90 held for  3 s  -> CRITICAL   (configurable, default on)
+ *   gas + smoke may be the agreeing pair  (configurable, default on: both are
+ *                                          metal-oxide sensors, one physics)
  *   leaving a state needs the score below 0.40 (hysteresis band of 0.20)
  *   humidity never votes; it only suppresses gas when steam is the likely cause
  *   an invalid modality is excluded from voting and raises the fault flag
@@ -60,6 +62,8 @@ typedef struct {
     float rh_context;          /* 0.75 - humidity score that counts as "steamy" */
     float heat_quiet;          /* 0.30 - heat score below this is "no heat rise" */
     float gas_suppress;        /* 0.50 - factor applied to gas in that case    */
+    bool mos_pair;             /* true  - gas and smoke alone may be the CRITICAL pair;
+                                  false needs flame or heat among the agreeing voters */
 } fx_config_t;
 
 typedef struct {
@@ -90,6 +94,12 @@ void fx_init(fx_engine_t *e, const fx_config_t *cfg, uint32_t now_ms);
 /* Feed one set of samples. Call as often as the sensors produce readings; the
  * DHT22 floors that at one reading every 2 s. */
 fx_result_t fx_update(fx_engine_t *e, const fx_sample_t samples[FX_MODALITY_COUNT], uint32_t now_ms);
+
+/* False when the rule set cannot be honoured by sensors that report no faster
+ * than sample_floor_ms (the DHT22 floor is 2000 ms): every dwell must be at
+ * least one sample period, CRITICAL must not be quicker than ELEVATED, and the
+ * exit threshold must sit below the entry threshold. */
+bool fx_config_check(const fx_config_t *cfg, uint32_t sample_floor_ms);
 
 const char *fx_state_name(fx_state_t s);
 const char *fx_modality_name(fx_modality_t m);

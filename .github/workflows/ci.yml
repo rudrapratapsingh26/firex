@@ -1,7 +1,8 @@
 name: CI
 
-# Every push builds the firmware tests, runs both test suites and drives the
-# scenario simulator. None of it needs a board attached.
+# Every push runs the host tests (C, TypeScript, Python), drives the scenario
+# simulator, builds the dashboard and the gateway image, and builds both ESP-IDF
+# firmware images. None of it needs a board.
 
 on:
   push:
@@ -16,12 +17,16 @@ jobs:
       - uses: actions/checkout@v4
       - name: Unit tests
         run: make -C firmware test
+      - name: The golden trace file matches the C encoder
+        run: make -C firmware trace-golden && git diff --exit-code firmware/test/trace_golden.fxt
+      - name: The secure element golden vectors match the C rules (tools/factory reads them)
+        run: make -C firmware se-golden && git diff --exit-code firmware/test/se_config_golden.h tools/factory/testdata/se_config_golden.json
       - name: Build the simulator harness
         run: make -C firmware sim
       - uses: actions/upload-artifact@v4
         with:
           name: fusion-build
-          path: firmware/build/
+          path: firmware/host-build/
 
   typescript:
     name: ledger, verifier, escalation (TypeScript)
@@ -37,10 +42,86 @@ jobs:
         run: npm run typecheck
       - name: Tests
         run: npm test
+      - name: C golden header matches the committed vector
+        run: npm run golden:c && git diff --exit-code firmware/test/ledger_golden.h
+      - name: C provisioning header matches the gateway's exchange
+        run: npm run golden:provision && git diff --exit-code firmware/test/provision_golden.h
+      - name: Dashboard builds
+        run: npm run dashboard:build
+      - name: A log exported by the C ledger verifies
+        run: make -C firmware bundle && npm run verify -- firmware/host-build/golden-bundle.json
       - name: Vectors are reproducible
         run: npm run vectors
       - name: The M0 milestone demo
         run: npm run demo
+      - name: Escalation dry run against mock endpoints
+        run: npm run escalation:dry-run -- --incidents 5 --dwell-ms 200 --ack-timeout-s 2 --out reports/escalation-dry-run
+
+  gateway-image:
+    name: gateway container and Compose stack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the firex-server image
+        run: docker build -f gateway/Dockerfile -t firex-server:ci .
+      - name: The Compose file is valid
+        run: cp infra/site.env.example infra/site.env && docker compose -f infra/docker-compose.yml --env-file infra/site.env config -q
+
+  tools:
+    name: capture, camera and calibration tools (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit tests
+        run: python -m unittest discover -s tools -p "test_*.py" -v
+
+  # Three node images from one source tree (M6): the dev kit, the EVT board, and the EVT
+  # production image with secure boot, flash encryption and the privacy locks. The
+  # production build is unsigned; the release key never reaches CI.
+  node-firmware:
+    name: node firmware, ${{ matrix.image }} (ESP-IDF, esp32s3)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: devkit
+            defaults: sdkconfig.defaults
+          - image: evt
+            defaults: sdkconfig.defaults;sdkconfig.evt
+          - image: evt-production
+            defaults: sdkconfig.defaults;sdkconfig.evt;sdkconfig.production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v5.5.5
+          target: esp32s3
+          path: firmware
+          command: idf.py -B build-${{ matrix.image }} -D SDKCONFIG=build-${{ matrix.image }}/sdkconfig -D "SDKCONFIG_DEFAULTS=${{ matrix.defaults }}" build
+
+  camera-firmware:
+    name: camera firmware, ${{ matrix.image }} (ESP-IDF, esp32)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: default
+            defaults: sdkconfig.defaults
+          - image: production
+            defaults: sdkconfig.defaults;sdkconfig.production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v5.5.5
+          target: esp32
+          path: firmware/cam
+          command: idf.py -B build-${{ matrix.image }} -D SDKCONFIG=build-${{ matrix.image }}/sdkconfig -D "SDKCONFIG_DEFAULTS=${{ matrix.defaults }}" build
 
   simulator:
     name: scenarios (Python)
@@ -56,3 +137,7 @@ jobs:
         run: make -C firmware sim
       - name: Every scenario behaves as declared
         run: python tools/simulator/simulate.py
+      - name: The replay harness and the reliability report, on synthetic trials
+        run: python tools/validation/replay.py --demo --out reports/replay-demo && python tools/validation/report.py reports/replay-demo.json --out reports/m4-demo.md
+      - name: The pilot report, on two synthetic sites
+        run: python tools/pilot/pilot_report.py --demo reports/pilot-demo-sites --out reports/pilot-demo

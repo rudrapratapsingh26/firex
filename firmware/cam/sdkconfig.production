@@ -1,0 +1,26 @@
+# ESP32-CAM production image (M6), layered on sdkconfig.defaults:
+#
+#   idf.py -B build-production -D SDKCONFIG=build-production/sdkconfig \
+#          -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.production" set-target esp32 build
+#
+# The camera enforces the media policy's "no capture from the console" rule, and it carries
+# a Wi-Fi radio of its own. On a unit that can see people only FireX's signed camera image may
+# run, so the first boot burns eFuses that can never be reset.
+CONFIG_FIREX_CAM_PRODUCTION=y
+
+# Secure boot v2 on the ESP32 needs chip revision 3.0 or later.
+CONFIG_ESP32_REV_MIN_3=y
+CONFIG_SECURE_BOOT=y
+CONFIG_SECURE_BOOT_V2_ENABLED=y
+CONFIG_SECURE_SIGNED_APPS_RSA_SCHEME=y
+CONFIG_SECURE_BOOT_BUILD_SIGNED_BINARIES=n
+CONFIG_SECURE_FLASH_ENC_ENABLED=y
+CONFIG_SECURE_FLASH_ENCRYPTION_MODE_RELEASE=y
+
+# The ESP32 has no secure download mode, so the ROM loader is disabled outright: left on, it
+# would run unsigned code in RAM. The camera has no network and no OTA, so its production
+# image is fixed for the life of the unit (docs/adr/0009-secure-boot-and-production-locks.md).
+CONFIG_SECURE_DISABLE_ROM_DL_MODE=y
+
+# Room for the larger bootloader.
+CONFIG_PARTITION_TABLE_OFFSET=0x10000

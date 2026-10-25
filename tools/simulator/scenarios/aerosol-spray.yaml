@@ -1,0 +1,36 @@
+# Deodorant sprayed near the unit. Butane and propane propellant drive the MQ-2
+# hard and the MQ-135 with it: two modalities in the engine, but both are
+# heated metal-oxide sensors, so this is one sensing physics agreeing with
+# itself. With fx_mos_pair 1 (the default) it reaches CRITICAL. Made-up numbers.
+name: aerosol spray
+description: Gas and smoke spike together for half a minute with no heat or flame. Reaches CRITICAL while fx_mos_pair is 1.
+duration_s: 180
+interval_s: 2
+warmup_s: 0
+
+channels:
+  gas:
+    - { until: 30,  from: 0.05, to: 0.05 }
+    - { until: 34,  from: 0.05, to: 0.86 }
+    - { until: 64,  from: 0.86, to: 0.80 }
+    - { until: 124, from: 0.80, to: 0.10 }
+    - { until: 180, from: 0.10, to: 0.06 }
+  gas_noise: 0.02
+  smoke:
+    - { until: 30,  from: 0.06, to: 0.06 }
+    - { until: 36,  from: 0.06, to: 0.74 }
+    - { until: 64,  from: 0.74, to: 0.70 }
+    - { until: 124, from: 0.70, to: 0.12 }
+    - { until: 180, from: 0.12, to: 0.08 }
+  smoke_noise: 0.02
+  heat: 0.08
+  humidity: 0.45
+  flame: 0.0
+
+expect: [NORMAL, CRITICAL]
+note: >
+  Known false positive. Setting fx_mos_pair to 0 holds this at ELEVATED, at the
+  cost of waiting for heat or flame on a smouldering fire (smouldering-fire.yaml).
+  M4 measures both on the bench; replay.py --sweep fx_mos_pair=1,0 shows the trade.
+
+trial: { class: nuisance, name: aerosol-deodorant, start_s: 30, end_s: 64 }

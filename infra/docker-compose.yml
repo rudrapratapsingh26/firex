@@ -1,0 +1,96 @@
+# The FireX site gateway: one `docker compose up -d` on a Raspberry Pi at the site.
+#
+#   cd infra
+#   cp site.env.example site.env        # set the hostname, IP and site name
+#   docker compose --env-file site.env up -d --build
+#   docker compose exec firex-server node --experimental-strip-types gateway/server/cli.ts user add admin --role admin
+#
+# Ports on the site LAN:
+#   443   dashboard (Caddy, local HTTPS)
+#   8883  MQTT over mutual TLS, for nodes
+#   8081  provisioning, for nodes joining with their pairing code
+#   8443  firmware downloads for nodes, mutual TLS (only while a rollout runs)
+# Nothing here needs the internet once the images are pulled.
+
+name: firex
+
+services:
+  firex-server:
+    build:
+      context: ..
+      dockerfile: gateway/Dockerfile
+    restart: unless-stopped
+    environment:
+      FIREX_SITE_ID: ${FIREX_SITE_ID:-site-001}
+      FIREX_SITE_NAME: ${FIREX_SITE_NAME:-Pilot site}
+      FIREX_MQTT_URL: mqtts://mosquitto:8883
+      # Units are given the fixed LAN address: the node firmware has no mDNS to resolve .local names.
+      FIREX_MQTT_ADVERTISED_HOST: ${FIREX_GATEWAY_IP:?set FIREX_GATEWAY_IP in site.env}
+      FIREX_MQTT_ADVERTISED_PORT: "8883"
+      # Every name or address nodes may use to reach the broker goes into its certificate.
+      FIREX_BROKER_NAMES: ${FIREX_HOSTNAME:-firex-gateway.local},${FIREX_GATEWAY_IP:-},mosquitto
+      FIREX_MEDIA_RETENTION_DAYS: ${FIREX_MEDIA_RETENTION_DAYS:-30}
+      # Escalation, off by default (docs/service-registry.md). A pilot site uses modem: a USB
+      # GSM modem on the Pi, with the devices and group_add lines below uncommented. http is for
+      # mock endpoints in a dry run. Services are drills until the registry makes them live.
+      FIREX_ALERT_PROVIDER: ${FIREX_ALERT_PROVIDER:-off}
+      FIREX_SERVICE_REGISTRY: ${FIREX_SERVICE_REGISTRY:-/data/service-registry.json}
+      FIREX_ALERT_HTTP_URL: ${FIREX_ALERT_HTTP_URL:-}
+      FIREX_ALERT_ACK_TIMEOUT_S: ${FIREX_ALERT_ACK_TIMEOUT_S:-60}
+      FIREX_ALERT_MAX_REALERTS: ${FIREX_ALERT_MAX_REALERTS:-1}
+      FIREX_MODEM_DEVICE: ${FIREX_MODEM_DEVICE:-/dev/ttyUSB2}
+      FIREX_MODEM_BAUD: ${FIREX_MODEM_BAUD:-115200}
+      FIREX_MODEM_RING_S: ${FIREX_MODEM_RING_S:-30}
+      # Firmware rollouts (infra/README.md section 8). The digest of the release signing key the units trust.
+      FIREX_FW_PORT: "8443"
+      FIREX_FW_SIGNING_KEY_SHA256: ${FIREX_FW_SIGNING_KEY_SHA256:-}
+      # ntp once the Pi's clock is known to be synchronised; the site ledger records which.
+      FIREX_CLOCK_SOURCE: ${FIREX_CLOCK_SOURCE:-uncertain}
+    # The modem's AT port, for FIREX_ALERT_PROVIDER=modem (a SIM7600 shows it as the third ttyUSB).
+    # devices:
+    #   - ${FIREX_MODEM_DEVICE:-/dev/ttyUSB2}:${FIREX_MODEM_DEVICE:-/dev/ttyUSB2}
+    # group_add:
+    #   - dialout
+    volumes:
+      - firex-data:/data
+    expose:
+      - "8080"
+    ports:
+      - "8081:8081"
+      - "8443:8443"
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    restart: unless-stopped
+    # Same uid as the node user in firex-server, so the broker can read the
+    # private key the gateway generated for it (mode 600).
+    user: "1000:1000"
+    depends_on:
+      firex-server:
+        condition: service_healthy
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/acl:/mosquitto/config/acl:ro
+      - firex-data:/firex:ro
+    ports:
+      - "8883:8883"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - firex-server
+    environment:
+      FIREX_HOSTNAME: ${FIREX_HOSTNAME:-firex-gateway.local}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+
+volumes:
+  firex-data: {}
+  caddy-data: {}
+  caddy-config: {}

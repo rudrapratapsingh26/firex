@@ -1,0 +1,18 @@
+# Local HTTPS for the dashboard, with Caddy's own internal CA: no public
+# certificate authority and no internet needed. Install Caddy's root
+# certificate on the security desk PCs once (infra/README.md).
+{
+	local_certs
+	skip_install_trust
+}
+
+{$FIREX_HOSTNAME:firex-gateway.local} {
+	encode gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy same-origin
+		X-Frame-Options DENY
+	}
+	reverse_proxy firex-server:8080
+}

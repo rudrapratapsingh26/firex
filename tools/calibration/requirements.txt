@@ -1,0 +1,3 @@
+# The notebooks. fxcal.py itself needs only the standard library.
+jupyter>=1.0
+matplotlib>=3.8

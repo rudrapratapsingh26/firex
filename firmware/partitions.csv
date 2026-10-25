@@ -1,0 +1,14 @@
+# FireX node, ESP32-S3 with 8 MB flash.
+# From M5, two app slots for over-the-air updates. nvs, ledger and media keep the offsets
+# they had in M2-M4, so a unit upgraded over USB keeps its device key, its ledger and its
+# photos: only the bootloader, this table, otadata and ota_0 are written. otadata and ota_1
+# take the 2 MB that was free at the end of the flash, which makes ota_1 the smaller slot:
+# every image must fit in 0x1E0000.
+# Name,     Type, SubType,  Offset,    Size
+nvs,        data, nvs,      0x9000,    0x6000
+phy_init,   data, phy,      0xf000,    0x1000
+ota_0,      app,  ota_0,    0x10000,   0x200000
+ledger,     data, littlefs, 0x210000,  0x100000
+media,      data, littlefs, 0x310000,  0x300000
+otadata,    data, ota,      0x610000,  0x2000
+ota_1,      app,  ota_1,    0x620000,  0x1E0000

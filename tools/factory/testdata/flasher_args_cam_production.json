@@ -1,0 +1,22 @@
+{
+    "write_flash_args" : [ "--flash_mode", "dio",
+                           "--flash_size", "keep",
+                           "--flash_freq", "40m" ],
+    "flash_settings" : {
+        "flash_mode": "dio",
+        "flash_size": "keep",
+        "flash_freq": "40m"
+    },
+    "flash_files" : {
+        "0x20000" : "firex_cam.bin",
+        "0x10000" : "partition_table/partition-table.bin"
+    },
+    "app" : { "offset" : "0x20000", "file" : "firex_cam.bin", "encrypted" : "false" },
+    "partition-table" : { "offset" : "0x10000", "file" : "partition_table/partition-table.bin", "encrypted" : "false" },
+    "extra_esptool_args" : {
+        "after"  : "no_reset",
+        "before" : "default_reset",
+        "stub"   : false,
+        "chip"   : "esp32"
+    }
+}

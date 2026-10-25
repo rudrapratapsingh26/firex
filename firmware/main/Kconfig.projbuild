@@ -1,0 +1,304 @@
+menu "FireX node"
+
+    choice FIREX_BOARD
+        prompt "Board"
+        default FIREX_BOARD_DEVKIT
+        help
+            Selects the hardware defaults in the menus below. sdkconfig.evt selects the
+            EVT board.
+
+        config FIREX_BOARD_DEVKIT
+            bool "ESP32-S3-DevKitC-1 on the bench (M1-M5)"
+
+        config FIREX_BOARD_EVT
+            bool "FireX EVT PCB (M6, pin map provisional)"
+            help
+                No schematic exists yet. The EVT defaults keep the dev kit's pins for every
+                part that carries over, add the thermistor on ADS1115 AIN2, and put the
+                ATECC608B on its own I2C bus (pins in sdkconfig.evt). Correct this file and
+                sdkconfig.evt when the PCB is drawn.
+    endchoice
+
+    comment "Pins: ESP32-S3 N8R8 module. Avoid GPIO 0, 3, 45, 46 (strapping), 19-20 (USB), 35-37 (octal PSRAM)."
+
+    menu "Sensors (M1)"
+
+        config FIREX_I2C_SDA_GPIO
+            int "I2C SDA GPIO (ADS1115)"
+            range 0 48
+            default 8
+
+        config FIREX_I2C_SCL_GPIO
+            int "I2C SCL GPIO (ADS1115)"
+            range 0 48
+            default 9
+
+        config FIREX_ADS1115_ADDR
+            hex "ADS1115 I2C address (ADDR pin to GND = 0x48)"
+            range 0x48 0x4B
+            default 0x48
+
+        config FIREX_MQ2_CHANNEL
+            int "ADS1115 input for the MQ-2 analog output"
+            range 0 3
+            default 0
+
+        config FIREX_MQ135_CHANNEL
+            int "ADS1115 input for the MQ-135 analog output"
+            range 0 3
+            default 1
+
+        config FIREX_MQ2_RL_OHMS
+            int "MQ-2 breakout load resistor RL, ohms (measure it on the board)"
+            range 100 100000
+            default 1000
+
+        config FIREX_MQ135_RL_OHMS
+            int "MQ-135 breakout load resistor RL, ohms (measure it on the board)"
+            range 100 100000
+            default 10000
+
+        config FIREX_AO_DIVIDER_TOP_OHMS
+            int "Divider resistor from each MQ AO to its ADS1115 input, ohms"
+            range 0 1000000
+            default 10000
+
+        config FIREX_AO_DIVIDER_BOTTOM_OHMS
+            int "Divider resistor from each ADS1115 input to GND, ohms (0 = no divider)"
+            range 0 1000000
+            default 20000
+
+        config FIREX_FLAME_GPIO
+            int "KY-026 analog output GPIO (must be an ADC1 pin, GPIO 1-10)"
+            range 1 10
+            default 4
+
+        config FIREX_DHT22_GPIO
+            int "DHT22 data GPIO (10 k pull-up to 3.3 V)"
+            range 0 48
+            default 5
+
+        config FIREX_FAN_PWM_GPIO
+            int "Fan PWM or MOSFET gate GPIO"
+            range 0 48
+            default 6
+
+        config FIREX_FAN_TACH_GPIO
+            int "Fan tachometer GPIO (-1 if not wired)"
+            range -1 48
+            default 7
+
+        config FIREX_STREAM_PERIOD_MS
+            int "Default serial stream period, ms"
+            range 100 60000
+            default 1000
+
+    endmenu
+
+    menu "Alarm and self-test (M2)"
+
+        config FIREX_BUZZER_GPIO
+            int "Buzzer GPIO (through a transistor for anything louder than a bare piezo)"
+            range 0 48
+            default 16
+
+        config FIREX_BUZZER_PASSIVE
+            bool "The buzzer is a passive piezo (drive it with a tone)"
+            default n
+            help
+                Off: an active buzzer that sounds when its input is high. On: a bare
+                piezo driven with a square wave at the tone below.
+
+        config FIREX_BUZZER_TONE_HZ
+            int "Passive buzzer tone, Hz"
+            depends on FIREX_BUZZER_PASSIVE
+            range 500 8000
+            default 3100
+
+        config FIREX_RING_GPIO
+            int "WS2812 status ring data GPIO (-1 if not fitted)"
+            range -1 48
+            default 15
+
+        config FIREX_RING_LEDS
+            int "LEDs on the status ring"
+            range 1 64
+            default 12
+
+        config FIREX_SILENCE_BUTTON_GPIO
+            int "Silence button GPIO, to GND when pressed (-1 if not fitted)"
+            range -1 48
+            default 14
+
+        config FIREX_FLAME_TEST_LED_GPIO
+            int "IR LED facing the KY-026 for the self-test loopback (-1 if not fitted)"
+            range -1 48
+            default 13
+
+    endmenu
+
+    menu "Camera link (M2)"
+
+        config FIREX_CAM_UART_TX_GPIO
+            int "Node TX GPIO, to the ESP32-CAM's link RX (its GPIO 13)"
+            range 0 48
+            default 17
+
+        config FIREX_CAM_UART_RX_GPIO
+            int "Node RX GPIO, from the ESP32-CAM's link TX (its GPIO 14)"
+            range 0 48
+            default 18
+
+        config FIREX_CAM_BAUD
+            int "Camera link baud rate (must match the camera image)"
+            default 460800
+
+    endmenu
+
+    menu "Bench (M4)"
+
+        config FIREX_BENCH_INJECT
+            bool "BENCH ONLY: allow `inject flame` from the USB console"
+            depends on !FIREX_PRODUCTION
+            default n
+            help
+                For the M4 burn-in. `inject flame <seconds>` flickers the self-test IR
+                LED at the flame sensor, so the real sensor, scorer, fusion, alarm,
+                camera and ledger path runs on a schedule. An injected CRITICAL fires
+                the camera, which makes the console a shutter: this image is for a test
+                scene on a bench and never for a unit that can see people. The firmware
+                version carries "+inject" in the banner, the boot entry and the gateway
+                hello, and `status` says so.
+
+    endmenu
+
+    menu "Network (M3)"
+
+        config FIREX_NET_ENABLE
+            bool "Connect to the site gateway (Wi-Fi, provisioning, MQTT)"
+            default y
+            help
+                Off: the M2 behaviour. The ledger and photos stay on the node and
+                are read over the serial console.
+
+        config FIREX_GATEWAY_PROVISION_PORT
+            int "Gateway provisioning port, when only a host is given"
+            depends on FIREX_NET_ENABLE
+            range 1 65535
+            default 8081
+
+        config FIREX_NET_TELEMETRY_S
+            int "Telemetry period, seconds"
+            depends on FIREX_NET_ENABLE
+            range 5 3600
+            default 10
+
+        config FIREX_NET_STATE_S
+            int "State republish period, seconds (it is also sent on every change)"
+            depends on FIREX_NET_ENABLE
+            range 10 3600
+            default 60
+
+    endmenu
+
+    menu "Heat sensor (M6)"
+
+        choice FIREX_HEAT_SENSOR
+            prompt "Temperature for the heat score"
+            default FIREX_HEAT_NTC if FIREX_BOARD_EVT
+            default FIREX_HEAT_DHT22
+
+            config FIREX_HEAT_DHT22
+                bool "DHT22 (dev kit): temperature and humidity from one part"
+
+            config FIREX_HEAT_NTC
+                bool "NTC thermistor on the ADS1115 (EVT): the DHT22 keeps humidity only"
+        endchoice
+
+        config FIREX_NTC_CHANNEL
+            int "ADS1115 input for the thermistor divider (not an MQ input)"
+            depends on FIREX_HEAT_NTC
+            range 0 3
+            default 2
+
+        config FIREX_NTC_FIXED_OHMS
+            int "Fixed resistor from the divider supply to the ADS1115 input, ohms"
+            depends on FIREX_HEAT_NTC
+            range 1000 100000
+            default 10000
+            help
+                The thermistor runs from the ADS1115 input to GND.
+
+        config FIREX_NTC_R25_OHMS
+            int "Thermistor resistance at 25 C, ohms"
+            depends on FIREX_HEAT_NTC
+            range 1000 100000
+            default 10000
+
+        config FIREX_NTC_BETA
+            int "Thermistor B constant (25/85 C), kelvin"
+            depends on FIREX_HEAT_NTC
+            range 2000 6000
+            default 3950
+
+        config FIREX_NTC_SUPPLY_MV
+            int "Divider supply, mV (measure it on the board)"
+            depends on FIREX_HEAT_NTC
+            range 1800 5000
+            default 3300
+
+        config FIREX_NTC_PERIOD_MS
+            int "Thermistor sampling period, ms"
+            depends on FIREX_HEAT_NTC
+            range 100 2000
+            default 500
+
+    endmenu
+
+    menu "Device key (M6)"
+
+        choice FIREX_DEVICE_KEY
+            prompt "Where the ledger's device key lives"
+            default FIREX_KEY_ATECC608B if FIREX_BOARD_EVT
+            default FIREX_KEY_NVS
+
+            config FIREX_KEY_NVS
+                bool "Software P-256 key in NVS (dev kit)"
+
+            config FIREX_KEY_ATECC608B
+                bool "ATECC608B secure element (EVT): generated in the chip, never exported"
+        endchoice
+
+        config FIREX_ATECC_I2C_PORT
+            int "I2C controller for the ATECC608B"
+            depends on FIREX_KEY_ATECC608B
+            range 0 1
+            default 1
+            help
+                cryptoauthlib's ESP32 HAL creates its own bus on this controller, on
+                CONFIG_ATCA_I2C_SDA_PIN and CONFIG_ATCA_I2C_SCL_PIN, so the secure element
+                cannot share the ADS1115's bus.
+
+    endmenu
+
+    menu "Production (M6)"
+
+        config FIREX_PRODUCTION
+            bool "Production image: privacy and debug locks"
+            default n
+            help
+                For units that leave the bench. The number of frames per CRITICAL is fixed
+                at build time and `config set` cannot change it, `media get` is removed so
+                photos leave the unit only to its gateway, and no bench option can be
+                selected. The build fails unless secure boot v2, flash encryption in release
+                mode and the ATECC608B device key are also selected (sdkconfig.production).
+
+        config FIREX_CAM_FRAMES_LOCKED
+            int "Frames captured per CRITICAL, fixed in firmware"
+            depends on FIREX_PRODUCTION
+            range 1 5
+            default 3
+
+    endmenu
+
+endmenu

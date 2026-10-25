@@ -1,0 +1,15 @@
+# FireX EVT PCB, ESP32-S3 with 8 MB flash (M6).
+# The table sits at 0x10000 (CONFIG_PARTITION_TABLE_OFFSET in sdkconfig.evt): the bootloader
+# with secure boot v2 and flash encryption does not fit before 0x8000. An EVT board starts
+# blank, so nothing here keeps the dev kit's offsets.
+# Two equal app slots. ledger and media are flagged encrypted: with flash encryption on they
+# are encrypted like the app, and in the development EVT image the flag is ignored. NVS
+# cannot carry the flag; the production image protects it with NVS encryption instead.
+# Name,     Type, SubType,  Offset,    Size,     Flags
+nvs,        data, nvs,      0x11000,   0x6000,
+phy_init,   data, phy,      0x17000,   0x1000,
+otadata,    data, ota,      0x18000,   0x2000,
+ota_0,      app,  ota_0,    0x20000,   0x1F0000,
+ota_1,      app,  ota_1,    0x210000,  0x1F0000,
+ledger,     data, littlefs, 0x400000,  0x100000, encrypted
+media,      data, littlefs, 0x500000,  0x300000, encrypted

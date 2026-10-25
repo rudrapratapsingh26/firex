@@ -58,7 +58,7 @@ const outcomes = await service.raise(alert);
 // The fire station answers in 34 seconds.
 clock += 34;
 const fire = outcomes.find((o) => o.service === 'fire')!;
-provider.acknowledge(fire.receipt.receipt_id, 'station-042');
+provider.acknowledge(fire.receipt!.receipt_id, 'station-042');
 console.log(`\n${stamp(clock)}  fire station acknowledged`);
 await service.poll(alert, outcomes);
 

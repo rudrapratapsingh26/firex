@@ -1,0 +1,46 @@
+# ESP32-S3-DevKitC-1 (N8R8). sdkconfig itself is generated and not committed.
+CONFIG_IDF_TARGET="esp32s3"
+CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+
+# nvs, two app slots (ota_0, ota_1), otadata, and two LittleFS partitions: ledger and media.
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# M5 over-the-air updates. A new image boots unconfirmed and must confirm itself
+# within 60 s (main/ota_task.c) or the bootloader goes back to the previous one.
+CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE=y
+# An update is written only if its secure boot v2 signature block (RSA-3072) verifies
+# with a key also in the running image's own signature block. This is the app half of
+# secure boot, without eFuses: hardware secure boot v2 with the same key is M6.
+CONFIG_SECURE_SIGNED_APPS_NO_SECURE_BOOT=y
+CONFIG_SECURE_SIGNED_APPS_RSA_SCHEME=y
+CONFIG_SECURE_SIGNED_ON_UPDATE_NO_SECURE_BOOT=y
+# No key in the repository or in CI: the build is unsigned and tools/ota/sign.py signs it.
+CONFIG_SECURE_BOOT_BUILD_SIGNED_BINARIES=n
+
+# 1 kHz tick: the flame sampler runs at 100 Hz, the alarm loop at 50 Hz, and the
+# DHT22 start pulse is 2 ms.
+CONFIG_FREERTOS_HZ=1000
+
+# A hung alarm, fusion or sensor task must reset the node, and the reset
+# reason is logged at the next boot.
+CONFIG_ESP_TASK_WDT_EN=y
+CONFIG_ESP_TASK_WDT_INIT=y
+CONFIG_ESP_TASK_WDT_TIMEOUT_S=5
+CONFIG_ESP_TASK_WDT_PANIC=y
+CONFIG_ESP_BROWNOUT_DET=y
+
+# The serial stream is parsed by tools/capture and tools/ledger; colour escapes only get in the way.
+CONFIG_LOG_COLORS=n
+
+# Console on the "UART" USB port (the on-board USB-to-UART bridge).
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+
+# M3 networking. The TLS client key is written out as PEM for esp-mqtt.
+CONFIG_MBEDTLS_PEM_WRITE_C=y
+# A photo is held in memory while it is published: use the N8R8 module's octal
+# PSRAM for that. A board without PSRAM still boots, with less headroom.
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_IGNORE_NOTFOUND=y

@@ -24,3 +24,6 @@ channels:
   flame: 0.0
 
 expect: [NORMAL, ELEVATED, CRITICAL]
+
+# The release starts at t = 0; time to alarm is measured from there.
+trial: { class: hazard, name: gas-lpg, start_s: 0, end_s: 300 }

@@ -1,0 +1,37 @@
+# FireX EVT production image (M6), layered last:
+#
+#   idf.py -B build-evt-production -D SDKCONFIG=build-evt-production/sdkconfig \
+#          -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.evt;sdkconfig.production" \
+#          set-target esp32s3 build
+#
+# The first boot of this image burns eFuses that can never be reset: secure boot with the
+# FireX release key, flash encryption in release mode, JTAG off, and the ROM serial loader
+# restricted. Install it only with tools/factory/provision.py (docs/bringup/m6-bench.md).
+CONFIG_FIREX_PRODUCTION=y
+CONFIG_FIREX_CAM_FRAMES_LOCKED=3
+
+# Secure boot v2, RSA-3072: the scheme and key of the M5 signed updates, now also checked by
+# the ROM against the key digest in eFuse. The build stays unsigned: tools/ota/sign.py signs
+# the bootloader and the app offline, and the key never reaches CI.
+CONFIG_SECURE_SIGNED_APPS_NO_SECURE_BOOT=n
+CONFIG_SECURE_BOOT=y
+CONFIG_SECURE_BOOT_V2_ENABLED=y
+CONFIG_SECURE_SIGNED_APPS_RSA_SCHEME=y
+CONFIG_SECURE_BOOT_BUILD_SIGNED_BINARIES=n
+
+# Flash encryption in release mode. The key is generated on the chip at first boot and
+# cannot be read back, and plaintext can no longer be written over serial.
+CONFIG_SECURE_FLASH_ENC_ENABLED=y
+CONFIG_SECURE_FLASH_ENCRYPTION_MODE_RELEASE=y
+
+# JTAG stays off (SECURE_BOOT_ALLOW_JTAG unset). The ROM loader keeps only secure download
+# mode, which can neither read flash nor run code in RAM.
+CONFIG_SECURE_ENABLE_SECURE_ROM_DL_MODE=y
+
+# NVS holds the Wi-Fi password, the pairing code, the TLS key and the site certificates. Its
+# encryption keys derive from an HMAC key that the app generates and burns into eFuse key
+# block 5 at first boot; the flash encryption key and the secure boot digest take the first
+# free blocks before it.
+CONFIG_NVS_ENCRYPTION=y
+CONFIG_NVS_SEC_KEY_PROTECT_USING_HMAC=y
+CONFIG_NVS_SEC_HMAC_EFUSE_KEY_ID=5

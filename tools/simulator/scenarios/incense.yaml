@@ -1,0 +1,24 @@
+# An incense stick in a closed room: smoke builds for ten minutes and lingers.
+# Nothing gets hotter and nothing flickers, so it should never go past ELEVATED;
+# how long it sits there is what a site will notice. Made-up numbers.
+name: incense
+description: Smoke climbs slowly to just over threshold with a little gas and no heat. ELEVATED at most.
+duration_s: 900
+interval_s: 2
+warmup_s: 0
+
+channels:
+  smoke:
+    - { until: 600, from: 0.05, to: 0.64 }
+    - { until: 900, from: 0.64, to: 0.55 }
+  smoke_noise: 0.02
+  gas:
+    - { until: 600, from: 0.05, to: 0.38 }
+    - { until: 900, from: 0.38, to: 0.35 }
+  heat: 0.06
+  humidity: 0.40
+  flame: 0.0
+
+expect: [NORMAL, ELEVATED]
+
+trial: { class: nuisance, name: incense-stick, start_s: 0, end_s: 600 }

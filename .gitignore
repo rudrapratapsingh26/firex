@@ -1,5 +1,12 @@
 # build output
 firmware/build/
+firmware/build-*/
+firmware/host-build/
+firmware/cam/build/
+firmware/cam/build-*/
+sdkconfig
+sdkconfig.old
+managed_components/
 dist/
 *.o
 *.exe
@@ -12,6 +19,19 @@ __pycache__/
 .venv/
 
 # local
+captures/
+reports/
+
+# signing keys never enter the repository (docs/bringup/m5-bench.md section 3)
+*-release*.pem
+tools/ota/keys/
+firmware/keys/
 *.log
 *.csv
+!firmware/partitions.csv
+!firmware/partitions_evt.csv
+
+# factory records: the manifest stays with production, and labels.csv holds pairing codes
+# (docs/operations.md)
+factory-records/
 .DS_Store

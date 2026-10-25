@@ -3,8 +3,9 @@
  *
  * Prints what would be sent and lets a test or an operator acknowledge on
  * behalf of a service. No telephony account, no control-room agreement, and
- * the escalation logic above it is exactly the code that will run in M5.
+ * the escalation logic above it is exactly the code that runs with a modem.
  */
+import { alertText } from './messages.ts';
 import type { Ack, Alert, AlertProvider, Receipt, Service, ServiceContact } from './provider.ts';
 
 export class ConsoleAlert implements AlertProvider {
@@ -12,12 +13,14 @@ export class ConsoleAlert implements AlertProvider {
   private counter = 0;
   private readonly acks = new Map<string, Ack>();
   readonly sent: Receipt[] = [];
+  /** The text of every alert, in order: what an SMS would have said. */
+  readonly texts: string[] = [];
 
   private readonly now: () => number;
   private readonly write: (line: string) => void;
 
   constructor(
-    now: () => number = () => Math.floor(Date.now() / 1000),
+    now: () => number = () => Date.now() / 1000,
     write: (line: string) => void = (line) => console.log(line),
   ) {
     this.now = now;
@@ -34,12 +37,15 @@ export class ConsoleAlert implements AlertProvider {
       sent_at: this.now(),
     };
     this.sent.push(receipt);
+    const text = alertText(alert, contact);
+    this.texts.push(text);
 
     const label = contact.service.toUpperCase().padEnd(9);
     this.write(`  → ${label} ${contact.name} (${contact.recipient}) via ${contact.channel}  [${receipt.receipt_id}]`);
-    this.write(`      FIREX CRITICAL · ${alert.site.site_name} · ${alert.where}`);
-    this.write(`      hazard: ${alert.hazard} · media: ${alert.media.frames} photos + ${alert.media.clip_seconds}s clip`);
-    this.write(`      ledger #${alert.ledger_seq} ${alert.ledger_hash.slice(0, 8)}… · reply 1 to acknowledge`);
+    this.write(`      ${text}`);
+    if ((alert.kind ?? 'incident') === 'incident') {
+      this.write(`      media: ${alert.media.frames} photos + ${alert.media.clip_seconds}s clip · ledger #${alert.ledger_seq} ${alert.ledger_hash.slice(0, 8)}…`);
+    }
     return receipt;
   }
 

@@ -22,3 +22,5 @@ channels:
   flame: 0.0
 
 expect: [NORMAL]
+
+trial: { class: nuisance, name: steam-shower, start_s: 4, end_s: 200 }

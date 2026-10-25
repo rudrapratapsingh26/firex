@@ -1,0 +1,5 @@
+## Microchip CryptoAuthLib for the ATECC608B on the EVT board. Resolved by the ESP-IDF
+## component manager; the resolved version is pinned in firmware/dependencies.lock.
+dependencies:
+  idf: ">=5.3"
+  espressif/esp-cryptoauthlib: "^3.7.9"

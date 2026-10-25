@@ -1,0 +1,11 @@
+.git
+node_modules
+firmware
+tools
+captures
+gateway-data
+dashboard/dist
+**/host-build
+**/__pycache__
+*.log
+sim-node.json

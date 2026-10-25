@@ -1,0 +1,16 @@
+# AI-Thinker ESP32-CAM: ESP32 with 4 MB flash and 4 MB PSRAM.
+CONFIG_IDF_TARGET="esp32"
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_PARTITION_TABLE_SINGLE_APP_LARGE=y
+
+# Frame buffers live in PSRAM.
+CONFIG_SPIRAM=y
+
+CONFIG_FREERTOS_HZ=1000
+
+# JPEG bytes share UART0 with the console, so keep logging to warnings and
+# errors. The SHA-256 in every frame header catches anything that still slips in.
+CONFIG_LOG_DEFAULT_LEVEL_WARN=y
+CONFIG_BOOTLOADER_LOG_LEVEL_WARN=y
+CONFIG_LOG_COLORS=n
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
